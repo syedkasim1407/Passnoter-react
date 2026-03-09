@@ -1,23 +1,46 @@
-import logo from './logo.svg';
 import './App.css';
+import Navbar from './header/Navbar';
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import Home from './pages/Home';
+import AddUser from './pages/AddUser';
+import LoginUser from './pages/LoginUser';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 function App() {
+
+  const [userid, setUserid] = useState(() => {
+    return localStorage.getItem("userId") || null;
+  });
+
+  useEffect(() => {
+    if (userid) {
+      localStorage.setItem("userId", userid);
+      
+    } else {
+      localStorage.removeItem("userId");
+      
+    }
+  }, [userid]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Navbar userid={userid} setUserid={setUserid}  />
+
+        <Routes>
+
+          <Route
+            path="/"
+            element={userid ? <Home userid={userid} /> : <Navigate to="/loginuser" />}
+          />
+
+          <Route path="/loginuser" element={<LoginUser setUserid={setUserid} />} />
+
+          <Route path="/adduser" element={<AddUser setUserid={setUserid} />} />
+
+        </Routes>
+      </Router>
     </div>
   );
 }

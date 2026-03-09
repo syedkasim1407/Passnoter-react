@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+/* .navbar-custom {
+  background-color: #212529;
+}
+
+.home-bg {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 30px;
+} */
+ 
+.navbar-custom {
+  background-color: #4f46e5;
+}
+
+.home-bg {
+  background-color: #eef2ff;
+  min-height: 100vh;
+  padding: 30px;
+}
