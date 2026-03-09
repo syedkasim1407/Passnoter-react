@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import "../App.css";
+
 export default function Navbar({ userid, setUserid }) {
 
   const logout = () => {
@@ -14,7 +15,9 @@ export default function Navbar({ userid, setUserid }) {
     <nav className="navbar navbar-expand-lg navbar-custom">
       <div className="container-fluid">
 
-        <a className="navbar-brand text-white"><b>PassNoter</b></a>
+        <Link to="/" className="navbar-brand text-white">
+          <b>PassNoter</b>
+        </Link>
 
         <div className="d-flex">
 
@@ -29,15 +32,13 @@ export default function Navbar({ userid, setUserid }) {
               </Link>
             </>
           )}
-         
+
           {userid && (
-            <button className="btn btn-light ps-7 fs-5"> 
-              <b>
-                {username}
-              </b>
+            <button className="btn btn-light ps-7 fs-5">
+              <b>{username}</b>
             </button>
           )}
-          
+
           {userid && (
             <button className="btn btn-danger px-2 ms-3 fs-8" onClick={logout}>
               Logout
