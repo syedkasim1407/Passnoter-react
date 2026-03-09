@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -36,14 +36,30 @@ function Home({ userid }) {
 
   const userId = userid;
 
+  // Load vault entries
+  const loadVaults = useCallback(async () => {
+
+    try {
+      const res = await axios.get(`${API_URL}/api/vault/${userId}`);
+      setVaults(res.data);
+    } catch (err) {
+      console.error("Error loading vaults:", err);
+    }
+
+  }, [userId]);
+
+  // Authentication check
   useEffect(() => {
+
     if (!userid) {
       navigate("/loginuser", { replace: true });
     } else {
       loadVaults();
     }
-  }, [userid]);
 
+  }, [userid, navigate, loadVaults]);
+
+  // Handle new vault input
   const handleChange = (e) => {
     setNewVault({
       ...newVault,
@@ -51,15 +67,7 @@ function Home({ userid }) {
     });
   };
 
-  const loadVaults = async () => {
-
-    const res = await axios.get(
-      `${API_URL}/api/vault/${userId}`
-    );
-
-    setVaults(res.data);
-  };
-
+  // Add new vault
   const addVault = async () => {
 
     if (!websiteName || !username || !email || !password) {
@@ -88,17 +96,21 @@ function Home({ userid }) {
     }
   };
 
+  // Start editing vault
   const startEdit = (vault) => {
     setEditVaultId(Number(vault.id));
     setEditVault(vault);
-  }
+  };
 
+  // Handle edit input
   const handleEditChange = (e) => {
     setEditVault({
-      ...editVault, [e.target.name]: e.target.value
+      ...editVault,
+      [e.target.name]: e.target.value
     });
-  }
+  };
 
+  // Update vault
   const updateVault = async (vaultId) => {
 
     if (!editVault.websiteName || !editVault.username || !editVault.email || !editVault.password) {
@@ -107,6 +119,7 @@ function Home({ userid }) {
     }
 
     try {
+
       const res = await axios.put(
         `${API_URL}/api/vault/${userId}/${vaultId}`,
         editVault
@@ -123,23 +136,22 @@ function Home({ userid }) {
         password: "",
       });
 
-    }
-    catch (e) {
+    } catch (e) {
       console.error("Error updating vault entry:", e);
     }
-  }
+  };
 
+  // Delete vault
   const onDelete = async (e) => {
 
     const vaultId = Number(e.target.value);
 
     try {
+
       const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
       if (!confirmDelete) return;
 
-      await axios.delete(
-        `${API_URL}/api/vault/${userId}/${vaultId}`
-      );
+      await axios.delete(`${API_URL}/api/vault/${userId}/${vaultId}`);
 
       setVaults(vaults.filter(v => v.id !== vaultId));
 
@@ -148,31 +160,35 @@ function Home({ userid }) {
     }
   };
 
+  // Toggle password visibility
   const toggleShowPassword = (vaultId) => {
 
     setShowPassword(prev => ({
       ...prev,
       [vaultId]: !prev[vaultId]
     }));
-  }
+  };
 
+  // Copy password
   const copyPassword = (password) => {
     navigator.clipboard.writeText(password);
     alert("Password copied to clipboard");
-  }
+  };
 
+  // Search filtering
   const filteredVaults =
     searchQuery.trim() === ""
       ? vaults
       : vaults.filter(v =>
-        v.websiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+          v.websiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          v.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          v.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
-  const sortedVault = [...filteredVaults].sort((a, b) => {
-    return a.websiteName.localeCompare(b.websiteName);
-  })
+  // Sort alphabetically
+  const sortedVault = [...filteredVaults].sort((a, b) =>
+    a.websiteName.localeCompare(b.websiteName)
+  );
 
   return (
 
